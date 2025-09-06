@@ -22,7 +22,11 @@ const modalBody = document.getElementById('modalBody');
 
 // Initialize EmailJS
 function initEmailJS() {
-    emailjs.init("HdQVpdT33jKEojhyW"); // Replace with your actual public key
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init("HdQVpdT33jKEojhyW"); // Replace with your actual public key
+    } else {
+        console.warn('EmailJS not loaded - emails will be disabled');
+    }
 }
 
 // Initialize admin panel
@@ -189,6 +193,11 @@ function hideLoginError() {
 
 // Email notification functions
 async function sendStatusUpdateEmail(project, newStatus, oldStatus) {
+    if (typeof emailjs === 'undefined') {
+        console.warn('EmailJS not available - skipping status update email');
+        return;
+    }
+
     if (!project.contactEmail) {
         console.warn('No email address found for project:', project.id);
         return;
