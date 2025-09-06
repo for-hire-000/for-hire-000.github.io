@@ -71,8 +71,8 @@ async function sendProjectConfirmationEmail(projectData) {
         };
 
         await emailjs.send(
-            'YOUR_SERVICE_ID', // Replace with your EmailJS service ID
-            'project_confirmation_template', // Replace with your template ID
+            'service_64bmwtd', // Replace with your EmailJS service ID
+            'template_iunzxdz', // Replace with your template ID
             templateParams
         );
 
