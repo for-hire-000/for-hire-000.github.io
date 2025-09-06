@@ -8,7 +8,6 @@ const firebaseConfig = {
     messagingSenderId: "1009990407995",
     appId: "1:1009990407995:web:8312a4fa6629e520b8c91e"
 };
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 // Initialize Firebase
 let db;
 let auth;
