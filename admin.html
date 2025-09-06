@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Code Forge</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="bg-particle"></div>
+        <div class="bg-particle"></div>
+        <div class="bg-particle"></div>
+        <div class="bg-particle"></div>
+        <div class="bg-particle"></div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="admin-logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <h1>ADMIN ACCESS</h1>
+                </div>
+                <p>Secure Administrative Portal</p>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="adminUsername">
+                        <i class="fas fa-envelope"></i>
+                        Email Address
+                    </label>
+                    <input type="email" id="adminUsername" name="email" required
+                           placeholder="Enter admin email" autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPassword">
+                        <i class="fas fa-lock"></i>
+                        Password
+                    </label>
+                    <input type="password" id="adminPassword" name="password" required
+                           placeholder="Enter admin password" autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <span>ACCESS SYSTEM</span>
+                    <i class="fas fa-sign-in-alt"></i>
+                </button>
+
+                <div id="loginError" class="login-error" style="display: none;"></div>
+            </form>
+
+            <div class="security-notice">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Unauthorized access is prohibited and monitored</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="admin-dashboard" style="display: none;">
+        <!-- Admin Navigation -->
+        <nav class="admin-nav">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>ADMIN PANEL</span>
+                </div>
+                <div class="nav-actions">
+                    <button class="refresh-btn" onclick="loadProjects()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Dashboard Content -->
+        <main class="dashboard-main">
+            <div class="dashboard-container">
+                <!-- Stats Overview -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalRequests">0</h3>
+                            <p>Total Requests</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="newRequests">0</h3>
+                            <p>New Requests</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="activeProjects">0</h3>
+                            <p>Active Projects</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-bitcoin"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="cryptoPayments">0</h3>
+                            <p>Crypto Payments</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-section">
+                    <div class="filters-container">
+                        <div class="filter-group">
+                            <label for="statusFilter">Status:</label>
+                            <select id="statusFilter" onchange="filterProjects()">
+                                <option value="">All Statuses</option>
+                                <option value="new">New</option>
+                                <option value="reviewing">Reviewing</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="typeFilter">Project Type:</label>
+                            <select id="typeFilter" onchange="filterProjects()">
+                                <option value="">All Types</option>
+                                <option value="cpp">C++</option>
+                                <option value="csharp">C#</option>
+                                <option value="both">Both</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="cryptoFilter">Crypto:</label>
+                            <select id="cryptoFilter" onchange="filterProjects()">
+                                <option value="">All Cryptos</option>
+                                <option value="BTC">Bitcoin</option>
+                                <option value="ETH">Ethereum</option>
+                                <option value="LTC">Litecoin</option>
+                                <option value="XMR">Monero</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="search-group">
+                            <input type="text" id="searchInput" placeholder="Search requests..."
+                                   onkeyup="filterProjects()">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects List -->
+                <div class="projects-section">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-inbox"></i>
+                            Project Requests
+                        </h2>
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="cards" onclick="toggleView('cards')">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button class="view-btn" data-view="table" onclick="toggleView('table')">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loadingState" class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Loading project requests...</p>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="empty-state" style="display: none;">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No Project Requests</h3>
+                        <p>New project requests will appear here when submitted.</p>
+                    </div>
+
+                    <!-- Projects Grid -->
+                    <div id="projectsGrid" class="projects-grid" style="display: none;"></div>
+
+                    <!-- Projects Table -->
+                    <div id="projectsTable" class="projects-table-container" style="display: none;">
+                        <table class="projects-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Budget</th>
+                                    <th>Crypto</th>
+                                    <th>Timeline</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="projectsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Project Detail Modal -->
+    <div id="projectModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <i class="fas fa-file-alt"></i>
+                    Project Details
+                </h2>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn-primary" onclick="updateProjectStatus()">Update Status</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <script src="script.js"></script>
+    <script src="admin-script.js"></script>
+</body>
+</html>
