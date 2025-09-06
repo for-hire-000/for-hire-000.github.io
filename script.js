@@ -19,6 +19,10 @@ if (typeof firebase !== 'undefined') {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
         auth = firebase.auth();
+
+        // Configure Firebase Auth settings
+        auth.useDeviceLanguage();
+
         console.log('Firebase initialized successfully');
     } catch (error) {
         console.error('Firebase initialization error:', error);
