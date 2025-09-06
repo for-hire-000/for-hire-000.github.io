@@ -35,6 +35,66 @@ if (typeof firebase !== 'undefined') {
 const projectForm = document.getElementById('projectForm');
 const submitBtn = document.querySelector('.submit-btn');
 
+// Initialize EmailJS
+function initEmailJS() {
+    emailjs.init("HdQVpdT33jKEojhyW"); // Replace with your actual public key
+}
+
+// Email notification function
+async function sendProjectConfirmationEmail(projectData) {
+    if (!projectData.contactEmail) {
+        console.warn('No email address found for project confirmation');
+        return;
+    }
+
+    try {
+        const templateParams = {
+            to_email: projectData.contactEmail,
+            project_type: getProjectTypeDisplay(projectData.projectType),
+            project_description: projectData.projectDescription.substring(0, 200) + (projectData.projectDescription.length > 200 ? '...' : ''),
+            timeline: getTimelineDisplay(projectData.timeline),
+            budget: projectData.budget,
+            crypto_payment: projectData.cryptoPayment,
+            contact_method: projectData.contactMethod,
+            project_id: projectData.id,
+            submission_date: new Date(projectData.timestamp).toLocaleDateString(),
+            submission_time: new Date(projectData.timestamp).toLocaleTimeString()
+        };
+
+        await emailjs.send(
+            'YOUR_SERVICE_ID', // Replace with your EmailJS service ID
+            'project_confirmation_template', // Replace with your template ID
+            templateParams
+        );
+
+        console.log('Project confirmation email sent successfully to:', projectData.contactEmail);
+
+    } catch (error) {
+        console.error('Error sending project confirmation email:', error);
+        // Don't throw error since this is a background operation
+    }
+}
+
+// Utility functions for email templates
+function getProjectTypeDisplay(type) {
+    const types = {
+        'cpp': 'C++',
+        'csharp': 'C#',
+        'both': 'C++ & C#'
+    };
+    return types[type] || type;
+}
+
+function getTimelineDisplay(timeline) {
+    const timelines = {
+        'rush': 'Rush (1-2 weeks)',
+        'standard': 'Standard (2-4 weeks)',
+        'extended': 'Extended (1-2 months)',
+        'flexible': 'Flexible'
+    };
+    return timelines[timeline] || timeline;
+}
+
 // Scroll to section function
 function scrollToSection(sectionId) {
     const section = document.getElementById(sectionId);
@@ -146,6 +206,9 @@ async function handleFormSubmission(event) {
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
 
+        // Send confirmation email
+        await sendProjectConfirmationEmail(data);
+
         showSuccessMessage();
         projectForm.reset();
 
@@ -171,7 +234,8 @@ function showSuccessMessage() {
     message.innerHTML = `
         <i class="fas fa-check-circle"></i>
         <strong>Request Submitted Successfully!</strong><br>
-        I'll review your project and get back to you within 24 hours via your preferred contact method.
+        I'll review your project and get back to you within 24 hours via your preferred contact method.<br>
+        <small>A confirmation email has been sent to your email address.</small>
     `;
     projectForm.appendChild(message);
 
@@ -353,6 +417,13 @@ function createBackgroundParticles() {
 // Initialize everything when DOM loads
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing Code Forge website...');
+
+    // Initialize EmailJS if available
+    if (typeof emailjs !== 'undefined') {
+        initEmailJS();
+    } else {
+        console.warn('EmailJS not loaded - email notifications will not work');
+    }
 
     // Initialize all features
     initScrollAnimations();
