@@ -20,9 +20,19 @@ const emptyState = document.getElementById('emptyState');
 const projectModal = document.getElementById('projectModal');
 const modalBody = document.getElementById('modalBody');
 
+// Initialize EmailJS
+function initEmailJS() {
+    emailjs.init("HdQVpdT33jKEojhyW"); // Replace with your actual public key
+}
+
 // Initialize admin panel
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing admin panel...');
+
+    // Initialize EmailJS if available
+    if (typeof emailjs !== 'undefined') {
+        initEmailJS();
+    }
 
     // Initialize Firebase Auth state listener
     initFirebaseAuth();
@@ -175,6 +185,43 @@ function showLoginError(message) {
 
 function hideLoginError() {
     loginError.style.display = 'none';
+}
+
+// Email notification functions
+async function sendStatusUpdateEmail(project, newStatus, oldStatus) {
+    if (!project.contactEmail) {
+        console.warn('No email address found for project:', project.id);
+        return;
+    }
+
+    try {
+        const templateParams = {
+            to_email: project.contactEmail,
+            project_type: getProjectTypeDisplay(project.projectType),
+            project_description: project.projectDescription.substring(0, 200) + (project.projectDescription.length > 200 ? '...' : ''),
+            old_status: getStatusDisplay(oldStatus),
+            new_status: getStatusDisplay(newStatus),
+            project_id: project.id,
+            timeline: getTimelineDisplay(project.timeline),
+            budget: project.budget,
+            crypto_payment: project.cryptoPayment,
+            contact_method: project.contactMethod
+        };
+
+        await emailjs.send(
+            'YOUR_SERVICE_ID', // Replace with your EmailJS service ID
+            'status_update_template', // Replace with your template ID
+            templateParams
+        );
+
+        console.log('Status update email sent successfully to:', project.contactEmail);
+        showSuccess('Status updated and notification email sent!');
+
+    } catch (error) {
+        console.error('Error sending status update email:', error);
+        showSuccess('Status updated successfully!');
+        // Don't show email error to user, just log it
+    }
 }
 
 // Project management functions
@@ -551,6 +598,13 @@ async function updateProjectStatus() {
     if (!selectedProject) return;
 
     const newStatus = document.getElementById('newStatus').value;
+    const oldStatus = selectedProject.status;
+
+    // Don't send email if status hasn't changed
+    if (newStatus === oldStatus) {
+        closeModal();
+        return;
+    }
 
     try {
         const db = window.CodeForge?.db();
@@ -575,12 +629,13 @@ async function updateProjectStatus() {
             filteredProjects[filteredIndex].status = newStatus;
         }
 
+        // Send status update email
+        await sendStatusUpdateEmail(selectedProject, newStatus, oldStatus);
+
         // Refresh display
         updateStats();
         displayProjects();
         closeModal();
-
-        showSuccess('Project status updated successfully!');
 
     } catch (error) {
         console.error('Error updating project status:', error);
