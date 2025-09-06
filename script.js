@@ -37,11 +37,20 @@ const submitBtn = document.querySelector('.submit-btn');
 
 // Initialize EmailJS
 function initEmailJS() {
-    emailjs.init("HdQVpdT33jKEojhyW"); // Replace with your actual public key
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init("HdQVpdT33jKEojhyW"); // Replace with your actual public key
+    } else {
+        console.warn('EmailJS not loaded - emails will be disabled');
+    }
 }
 
 // Email notification function
 async function sendProjectConfirmationEmail(projectData) {
+    if (typeof emailjs === 'undefined') {
+        console.warn('EmailJS not available - skipping confirmation email');
+        return;
+    }
+
     if (!projectData.contactEmail) {
         console.warn('No email address found for project confirmation');
         return;
